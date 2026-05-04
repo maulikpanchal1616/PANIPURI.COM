@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root {
+  --brand-saffron: #FF6B2B;
+  --brand-deep: #1A0A00;
+  --brand-cream: #FFF8F0;
+  --brand-gold: #F59E0B;
+  --shadow-xl: 0 20px 60px rgba(255,107,43,0.22);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+body {
+  font-family: 'Inter', 'Outfit', system-ui, sans-serif;
+  background: #FFF8F0;
+  color: #1A0A00;
+  min-height: 100dvh;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #FF6B2B; border-radius: 99px; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f0e8df 25%, #fdf6ee 50%, #f0e8df 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease infinite;
+  border-radius: 12px;
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.92) translateY(16px); }
+  60% { opacity: 1; transform: scale(1.02) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.pop-in { animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+.float { animation: float 3s ease-in-out infinite; }
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,43,0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(255,107,43,0); }
+}
+.pulse-glow { animation: pulseGlow 2s ease infinite; }
+
+.gradient-text {
+  background: linear-gradient(135deg, #FF6B2B 0%, #F59E0B 50%, #FF6B2B 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+.glass {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,107,43,0.12);
+}
+
+.card-hover {
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--shadow-xl);
+}
+
+.magnetic-btn {
+  position: relative;
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  cursor: pointer;
+}
+
+.pb-safe { padding-bottom: max(80px, env(safe-area-inset-bottom)); }
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.admin-dark { background: #0D0D0D; color: #F9FAFB; }
