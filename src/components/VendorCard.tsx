@@ -31,9 +31,9 @@ export default function VendorCard({ vendor, index = 0 }: VendorCardProps) {
       transition={{ duration: 0.4, delay: index * 0.08, ease: [0.34, 1.56, 0.64, 1] }}
     >
       <Link href={`/vendor/${vendor.id}`}>
-        <div className="bg-white rounded-3xl overflow-hidden shadow-md border border-orange-50 group card-hover">
+        <div className="bg-white rounded-3xl overflow-hidden shadow-md border border-orange-50 group card-hover isolation-auto">
           {/* Banner */}
-          <div className="relative h-36 bg-gradient-to-br from-orange-100 to-amber-100 overflow-hidden">
+          <div className="relative h-36 bg-gradient-to-br from-orange-100 to-amber-100 overflow-hidden rounded-t-3xl">
             {vendor.bannerUrl ? (
               <img src={vendor.bannerUrl} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
             ) : (

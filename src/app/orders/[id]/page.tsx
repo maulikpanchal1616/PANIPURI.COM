@@ -165,8 +165,13 @@ export default function OrderDetailPage() {
             {payment && (
               <div className="flex justify-between text-sm pt-1">
                 <span className="text-gray-500">Payment</span>
-                <span className={`font-bold ${payment.status === "SUCCESS" ? "text-green-600" : "text-yellow-600"}`}>
-                  {payment.status === "SUCCESS" ? "✅ Paid" : "⏳ Pending"} via {payment.method as string}
+                <span className={`font-bold ${payment.status === "SUCCESS" ? "text-green-600" : "text-amber-600"}`}>
+                  {payment.method === "COD" && payment.status === "PENDING" 
+                    ? "🕒 Pay on Delivery" 
+                    : payment.status === "SUCCESS" 
+                      ? "✅ Paid" 
+                      : "⏳ Pending"} 
+                  <span className="text-xs opacity-70 ml-1">via {payment.method as string}</span>
                 </span>
               </div>
             )}

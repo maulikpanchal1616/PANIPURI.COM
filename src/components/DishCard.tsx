@@ -60,11 +60,11 @@ export default function DishCard({ dish, index = 0 }: DishCardProps) {
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ transition: "transform 0.3s cubic-bezier(0.34,1.56,0.64,1)", willChange: "transform" }}
-      className="bg-white rounded-3xl overflow-hidden shadow-md border border-orange-50 group cursor-pointer"
+      style={{ transition: "transform 0.3s cubic-bezier(0.34,1.56,0.64,1)", willChange: "transform", transformStyle: "preserve-3d" }}
+      className="bg-white rounded-3xl overflow-hidden shadow-md border border-orange-50 group cursor-pointer isolation-auto"
     >
       {/* Image */}
-      <div className="relative h-44 overflow-hidden bg-orange-50">
+      <div className="relative h-44 overflow-hidden bg-orange-50 rounded-t-3xl">
         {dish.imageUrl ? (
           <img
             src={dish.imageUrl}
@@ -133,9 +133,14 @@ export default function DishCard({ dish, index = 0 }: DishCardProps) {
 
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
-            <span className="font-bold text-orange-600 text-lg leading-none">
-              ₹{dish.discountPrice ?? dish.price}
-            </span>
+            <div className="flex items-baseline gap-1">
+              <span className="font-bold text-orange-600 text-lg leading-none">
+                ₹{dish.discountPrice ?? dish.price}
+              </span>
+              {dish.portionSize && (
+                <span className="text-[10px] text-gray-400 font-medium">/ {dish.portionSize}</span>
+              )}
+            </div>
             {dish.discountPrice && (
               <span className="text-xs text-gray-400 line-through">₹{dish.price}</span>
             )}

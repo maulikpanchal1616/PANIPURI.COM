@@ -7,8 +7,14 @@ import { useSession } from "next-auth/react";
 import { useCartStore } from "@/store/cartStore";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
-import { MapPin, CreditCard, Smartphone, Wallet, ChevronRight, Loader2, CheckCircle2, ShoppingBag, Crosshair } from "lucide-react";
+import { MapPin, CreditCard, Smartphone, Wallet, ChevronRight, Loader2, CheckCircle2, ShoppingBag, Crosshair, Map as MapIcon } from "lucide-react";
 import confetti from "canvas-confetti";
+import dynamic from "next/dynamic";
+
+const LocationPicker = dynamic(() => import("@/components/LocationPicker"), { 
+  ssr: false,
+  loading: () => <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm"><Loader2 className="w-8 h-8 text-orange-500 animate-spin" /></div>
+});
 
 const PAYMENT_METHODS = [
   { id: "UPI", label: "UPI (PhonePe / GPay / Paytm)", icon: <Smartphone className="w-5 h-5 text-purple-500" /> },
@@ -31,6 +37,7 @@ export default function CheckoutPage() {
   const [finalAmount, setFinalAmount] = useState<number>(0);
   const [hasHydrated, setHasHydrated] = useState(false);
   const [detectingLocation, setDetectingLocation] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   const handleDetectLocation = () => {
     setDetectingLocation(true);
@@ -187,8 +194,16 @@ export default function CheckoutPage() {
           <p className="text-sm text-orange-500 font-semibold mb-8">Est. delivery: 25–35 minutes</p>
           <div className="bg-orange-50 rounded-2xl p-4 mb-8 text-left">
             <div className="flex justify-between text-sm mb-1"><span className="text-gray-500">Order ID</span><span className="font-mono font-bold text-gray-700">#{orderId?.slice(-8).toUpperCase()}</span></div>
-            <div className="flex justify-between text-sm mb-1"><span className="text-gray-500">Amount Paid</span><span className="font-bold text-orange-600">₹{finalAmount.toFixed(0)}</span></div>
-            <div className="flex justify-between text-sm"><span className="text-gray-500">Payment</span><span className="font-bold text-green-600">{paymentMethod}</span></div>
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-gray-500">{paymentMethod === "COD" ? "Amount to Pay" : "Amount Paid"}</span>
+              <span className="font-bold text-orange-600">₹{finalAmount.toFixed(0)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Payment</span>
+              <span className={`font-bold ${paymentMethod === "COD" ? "text-amber-600" : "text-green-600"}`}>
+                {paymentMethod === "COD" ? "Cash on Delivery" : paymentMethod}
+              </span>
+            </div>
           </div>
           <motion.button whileTap={{ scale: 0.97 }} onClick={() => router.push(`/orders/${orderId}`)}
             className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-orange-200">
@@ -217,14 +232,23 @@ export default function CheckoutPage() {
                   Delivery Address
                 </h2>
                 <button
-                  onClick={handleDetectLocation}
-                  disabled={detectingLocation}
+                  onClick={() => setShowMap(true)}
                   className="flex items-center gap-1.5 text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-50 px-3 py-1.5 rounded-xl transition-all"
                 >
-                  {detectingLocation ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Crosshair className="w-3.5 h-3.5" />}
-                  Detect My Location
+                  <MapIcon className="w-3.5 h-3.5" />
+                  Select on Map
                 </button>
               </div>
+              
+              {showMap && (
+                <LocationPicker 
+                  onClose={() => setShowMap(false)} 
+                  onLocationSelect={(addr) => {
+                    setAddress(addr);
+                    setShowMap(false);
+                  }}
+                />
+              )}
               <div className="relative">
                 <MapPin className="absolute left-4 top-4 w-5 h-5 text-orange-400" />
                 <textarea id="delivery-address" value={address} onChange={(e) => setAddress(e.target.value)} rows={3}

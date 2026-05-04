@@ -15,6 +15,7 @@ export async function GET(
         address: true,
         upiId: true,
         logoUrl: true,
+        isActive: true,
       },
     });
 

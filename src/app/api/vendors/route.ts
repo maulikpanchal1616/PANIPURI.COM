@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") ?? "12");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = { isApproved: true, isActive: true };
+    const where: any = { isApproved: true };
 
     if (search) {
       where.OR = [

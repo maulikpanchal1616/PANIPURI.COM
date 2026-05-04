@@ -24,16 +24,18 @@ export async function POST(req: NextRequest) {
     const razorpayPaymentId = `pay_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const razorpaySignature = `sig_${Date.now()}`;
 
+    const isCOD = paymentMethod === "COD";
+
     // Create payment record & update order status atomically
     const [payment, updatedOrder] = await Promise.all([
       prisma.paymentTransaction.create({
         data: {
           orderId,
-          razorpayOrderId,
-          razorpayPaymentId,
-          razorpaySignature,
+          razorpayOrderId: isCOD ? null : razorpayOrderId,
+          razorpayPaymentId: isCOD ? null : razorpayPaymentId,
+          razorpaySignature: isCOD ? null : razorpaySignature,
           amount: order.totalAmount + order.deliveryFee,
-          status: "SUCCESS",
+          status: isCOD ? "PENDING" : "SUCCESS",
           method: paymentMethod ?? "UPI",
         },
       }),
@@ -42,7 +44,13 @@ export async function POST(req: NextRequest) {
         data: { status: "CONFIRMED" },
       }),
       prisma.deliveryLog.create({
-        data: { orderId, status: "CONFIRMED", message: "Payment successful! Your order is confirmed." },
+        data: { 
+          orderId, 
+          status: "CONFIRMED", 
+          message: isCOD 
+            ? "Order confirmed! Please pay at the time of delivery." 
+            : "Payment successful! Your order is confirmed." 
+        },
       }),
       prisma.vendor.update({
         where: { id: order.vendorId },

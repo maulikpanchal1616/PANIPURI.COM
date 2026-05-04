@@ -6,9 +6,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
+import Link from "next/link";
 import {
   LayoutDashboard, UtensilsCrossed, Store, Package,
-  ToggleLeft, ToggleRight, Plus, TrendingUp, Star, Eye, EyeOff, Smartphone
+  ToggleLeft, ToggleRight, Plus, TrendingUp, Star, Eye, EyeOff, Smartphone, Edit
 } from "lucide-react";
 
 type Dish = { id: string; name: string; price: number; isAvailable: boolean; category: string; rating: number; totalOrders: number; imageUrl?: string };
@@ -67,14 +68,15 @@ export default function VendorDashboardPage() {
     { id: "settings", label: "Settings", icon: Store },
   ] as const;
 
-  const [vendorData, setVendorData] = useState<{ businessName: string; address: string; upiId: string }>({
+  const [vendorData, setVendorData] = useState<{ businessName: string; address: string; upiId: string; isActive: boolean }>({
     businessName: "",
     address: "",
     upiId: "",
+    isActive: true,
   });
 
   useEffect(() => {
-    if (activeTab === "settings") {
+    if (activeTab === "settings" || activeTab === "overview") {
       fetch("/api/vendor/profile")
         .then((r) => r.json())
         .then((data) => {
@@ -83,21 +85,23 @@ export default function VendorDashboardPage() {
               businessName: data.vendor.businessName || "",
               address: data.vendor.address || "",
               upiId: data.vendor.upiId || "",
+              isActive: data.vendor.isActive ?? true,
             });
           }
         });
     }
   }, [activeTab]);
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleUpdateProfile = async (updatedData?: Partial<typeof vendorData>) => {
+    const newData = { ...vendorData, ...updatedData };
     const res = await fetch("/api/vendor/profile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(vendorData),
+      body: JSON.stringify(newData),
     });
     if (res.ok) {
-      alert("Profile updated successfully!");
+      setVendorData(newData);
+      if (!updatedData) alert("Profile updated successfully!");
     }
   };
 
@@ -137,12 +141,29 @@ export default function VendorDashboardPage() {
                 { label: "Dishes", value: stats.totalDishes, icon: "🍽️", color: "from-purple-500 to-purple-600" },
               ].map((stat) => (
                 <motion.div key={stat.label} whileHover={{ y: -4 }}
-                  className={`bg-gradient-to-br ${stat.color} rounded-3xl p-5 text-white`}>
+                  className={`bg-gradient-to-br ${stat.color} rounded-3xl p-5 text-white shadow-lg`}>
                   <div className="text-3xl mb-3">{stat.icon}</div>
                   <p className="text-2xl font-black">{stat.value}</p>
                   <p className="text-sm opacity-80 mt-1">{stat.label}</p>
                 </motion.div>
               ))}
+            </div>
+
+            {/* Shop status toggle in overview */}
+            <div className="bg-white rounded-3xl p-6 border border-orange-100 shadow-sm flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl ${vendorData.isActive ? "bg-green-100" : "bg-gray-100"}`}>
+                  {vendorData.isActive ? "🟢" : "🔴"}
+                </div>
+                <div>
+                  <p className="font-bold text-gray-800 text-lg">Shop Status: {vendorData.isActive ? "Open" : "Closed"}</p>
+                  <p className="text-sm text-gray-500">{vendorData.isActive ? "Customers can place orders now" : "Customers cannot place orders"}</p>
+                </div>
+              </div>
+              <button onClick={() => handleUpdateProfile({ isActive: !vendorData.isActive })}
+                className={`flex items-center gap-2 transition-all ${vendorData.isActive ? "text-green-600" : "text-gray-400"}`}>
+                {vendorData.isActive ? <ToggleRight className="w-12 h-12" /> : <ToggleLeft className="w-12 h-12" />}
+              </button>
             </div>
 
             {/* Recent orders */}
@@ -204,12 +225,17 @@ export default function VendorDashboardPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-black text-orange-600">₹{dish.price}</span>
-                      <button onClick={() => toggleDish(dish.id, dish.isAvailable)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${dish.isAvailable ? "bg-green-100 text-green-700 hover:bg-green-200" : "bg-red-100 text-red-600 hover:bg-red-200"}`}>
-                        {dish.isAvailable ? <><Eye className="w-3.5 h-3.5" /> In Stock</> : <><EyeOff className="w-3.5 h-3.5" /> Out of Stock</>}
-                      </button>
+                    <div className="flex items-center justify-between mt-auto">
+                      <span className="font-black text-orange-600 text-lg">₹{dish.price}</span>
+                      <div className="flex items-center gap-2">
+                        <Link href={`/vendor/dishes/${dish.id}`} className="p-2 bg-orange-50 text-orange-500 rounded-xl hover:bg-orange-100 transition-colors">
+                          <Edit className="w-4 h-4" />
+                        </Link>
+                        <button onClick={() => toggleDish(dish.id, dish.isAvailable)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all ${dish.isAvailable ? "bg-green-100 text-green-700 hover:bg-green-200" : "bg-red-100 text-red-600 hover:bg-red-200"}`}>
+                          {dish.isAvailable ? <><Eye className="w-3.5 h-3.5" /> In Stock</> : <><EyeOff className="w-3.5 h-3.5" /> Out</>}
+                        </button>
+                      </div>
                     </div>
                   </motion.div>
                 ))}
@@ -285,7 +311,17 @@ export default function VendorDashboardPage() {
         {activeTab === "settings" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white rounded-3xl p-8 border border-orange-100 shadow-sm max-w-2xl">
             <h2 className="text-2xl font-black text-gray-800 mb-6" style={{ fontFamily: "Outfit" }}>Shop Settings</h2>
-            <form onSubmit={handleUpdateProfile} className="space-y-6">
+            <form onSubmit={(e) => { e.preventDefault(); handleUpdateProfile(); }} className="space-y-6">
+              <div className="flex items-center justify-between p-4 bg-orange-50 rounded-2xl border border-orange-100">
+                <div>
+                  <p className="font-bold text-gray-800">Operational Status</p>
+                  <p className="text-xs text-gray-500">Toggle whether your shop is currently open</p>
+                </div>
+                <button type="button" onClick={() => setVendorData({ ...vendorData, isActive: !vendorData.isActive })}
+                  className={`flex items-center gap-2 transition-all ${vendorData.isActive ? "text-green-600" : "text-gray-400"}`}>
+                  {vendorData.isActive ? <ToggleRight className="w-10 h-10" /> : <ToggleLeft className="w-10 h-10" />}
+                </button>
+              </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Business Name</label>
                 <input type="text" value={vendorData.businessName} onChange={(e) => setVendorData({ ...vendorData, businessName: e.target.value })}

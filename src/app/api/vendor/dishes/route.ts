@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     if (!vendor) return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
 
     const body = await req.json();
-    const { name, description, price, category, isVeg, imageUrl } = body;
+    const { name, description, price, category, isVeg, imageUrl, stock, portionSize } = body;
 
     const dish = await prisma.dish.create({
       data: {
@@ -54,6 +54,8 @@ export async function POST(req: NextRequest) {
         isVeg: Boolean(isVeg),
         imageUrl: imageUrl || null,
         isAvailable: true,
+        stock: parseInt(stock?.toString() || "99"),
+        portionSize,
       },
     });
 

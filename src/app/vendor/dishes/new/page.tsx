@@ -21,6 +21,8 @@ export default function NewDishPage() {
     category: "STREET_FOOD",
     isVeg: true,
     imageUrl: "",
+    stock: "99",
+    portionSize: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,6 +77,16 @@ export default function NewDishPage() {
                 <label className="block text-sm font-bold text-gray-700 mb-2">Price (₹) *</label>
                 <input required type="number" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })}
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition-all" placeholder="e.g. 150" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Stock Quantity *</label>
+                <input required type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition-all" placeholder="e.g. 50" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Item Quantity (Portion) *</label>
+                <input required type="text" value={form.portionSize} onChange={(e) => setForm({ ...form, portionSize: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition-all" placeholder="e.g. 1 Plate / 2 Pcs / 500ml" />
               </div>
             </div>
 
