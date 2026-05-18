@@ -54,6 +54,7 @@ export interface DishWithVendor {
   rating: number;
   totalOrders: number;
   prepTime: number;
+  portionSize?: string;
   tags: string[];
   vendor: {
     id: string;

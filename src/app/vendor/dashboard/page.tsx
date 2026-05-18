@@ -19,7 +19,7 @@ type Stats = { totalOrders: number; totalRevenue: number; rating: number; totalD
 export default function VendorDashboardPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"overview" | "dishes" | "stalls" | "orders">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "dishes" | "stalls" | "orders" | "settings">("overview");
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [subVendors, setSubVendors] = useState<SubVendor[]>([]);
   const [stats, setStats] = useState<Stats>({ totalOrders: 0, totalRevenue: 0, rating: 0, totalDishes: 0 });
