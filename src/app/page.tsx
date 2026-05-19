@@ -105,7 +105,7 @@ export default function HomePage() {
       {/* HERO */}
       <motion.section
         style={{ opacity: heroOpacity, y: heroY }}
-        className="relative min-h-[92vh] flex flex-col items-center justify-center overflow-hidden px-4 pt-20"
+        className="relative min-h-[85vh] md:min-h-[92vh] flex flex-col items-center justify-start md:justify-center overflow-hidden px-4 pt-32 md:pt-20"
       >
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div animate={{ x: [0,30,0], y: [0,-20,0] }} transition={{ duration: 12, repeat: Infinity }} className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-orange-200/40 rounded-full blur-3xl" />

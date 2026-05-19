@@ -202,7 +202,7 @@ export default function Navbar() {
             {/* Mobile menu */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="hidden w-10 h-10 items-center justify-center rounded-xl hover:bg-orange-50 transition-colors"
+              className="md:hidden flex w-10 h-10 items-center justify-center rounded-xl hover:bg-orange-50 transition-colors"
             >
               {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
