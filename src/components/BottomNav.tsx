@@ -18,6 +18,7 @@ const NAV_ITEMS = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const totalItems = useCartStore((s) => s.getTotalItems());
   const toggleCart = useCartStore((s) => s.toggleCart);
   const [mounted, setMounted] = useState(false);
@@ -25,6 +26,13 @@ export default function BottomNav() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const visibleNavItems = NAV_ITEMS.filter((item) => {
+    if (!session && (item.label === "Orders" || item.label === "Profile")) {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <motion.nav
@@ -35,7 +43,7 @@ export default function BottomNav() {
     >
       <div className="bg-white/95 backdrop-blur-xl border-t border-orange-100 shadow-2xl">
         <div className="flex items-center justify-around px-2 py-2 pb-nav-safe">
-          {NAV_ITEMS.map(({ href, icon: Icon, label, isCart }) => {
+          {visibleNavItems.map(({ href, icon: Icon, label, isCart }) => {
             const isActive = pathname === href;
 
             if (isCart) {
