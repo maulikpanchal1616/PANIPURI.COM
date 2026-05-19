@@ -84,6 +84,7 @@ body {
 }
 
 .pb-safe { padding-bottom: max(80px, env(safe-area-inset-bottom)); }
+.pb-nav-safe { padding-bottom: env(safe-area-inset-bottom); }
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .admin-dark { background: #0D0D0D; color: #F9FAFB; }

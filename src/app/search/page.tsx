@@ -59,7 +59,6 @@ function SearchContent() {
 
   return (
     <>
-      {/* Search input */}
       <div className="relative mb-6">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         <input
@@ -68,9 +67,9 @@ function SearchContent() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search dishes, restaurants, cuisines..."
-          className="w-full pl-12 pr-32 py-4 bg-white border border-orange-100 rounded-2xl text-sm outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition-all shadow-sm"
+          className="w-full pl-11 pr-20 sm:pr-32 py-3.5 sm:py-4 bg-white border border-orange-100 rounded-2xl text-sm outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition-all shadow-sm"
         />
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
           {query && (
             <button onClick={() => setQuery("")} className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors">
               <X className="w-4 h-4 text-gray-500" />
@@ -78,9 +77,10 @@ function SearchContent() {
           )}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold transition-all ${showFilters ? "bg-orange-500 text-white" : "bg-orange-50 text-orange-600 hover:bg-orange-100"}`}
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${showFilters ? "bg-orange-500 text-white" : "bg-orange-50 text-orange-600 hover:bg-orange-100"}`}
           >
-            <SlidersHorizontal className="w-4 h-4" /> Filter
+            <SlidersHorizontal className="w-3.5 h-3.5" /> 
+            <span className="hidden sm:inline">Filter</span>
           </button>
         </div>
       </div>

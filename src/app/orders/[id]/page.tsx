@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
-import { CheckCircle2, Clock, ChefHat, Truck, Package, XCircle, MapPin } from "lucide-react";
+import { CheckCircle2, Clock, ChefHat, Truck, Package, XCircle, MapPin, ArrowLeft } from "lucide-react";
 
 const STATUS_STEPS = [
   { key: "PENDING", label: "Order Placed", icon: Package },
@@ -18,20 +18,21 @@ const STATUS_STEPS = [
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { data: session } = useSession();
+  const { data: session, status: authStatus } = useSession();
   const router = useRouter();
   const [order, setOrder] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!session) { router.push("/auth/login"); return; }
+    if (authStatus === "loading") return;
+    if (authStatus === "unauthenticated" || !session) { router.push(`/auth/login?callbackUrl=/orders/${id}`); return; }
     const fetchOrder = () => {
       fetch(`/api/orders/${id}`).then((r) => r.json()).then((d) => setOrder(d.order)).finally(() => setLoading(false));
     };
     fetchOrder();
     const interval = setInterval(fetchOrder, 15000);
     return () => clearInterval(interval);
-  }, [id, session]);
+  }, [id, session, authStatus]);
 
   if (loading) return (
     <div className="min-h-screen bg-[#FFF8F0] flex items-center justify-center">
@@ -56,6 +57,13 @@ export default function OrderDetailPage() {
     <div className="min-h-screen bg-[#FFF8F0] pb-safe">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 pt-24 pb-20 space-y-5">
+        <button 
+          onClick={() => router.back()} 
+          className="flex items-center gap-1.5 text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-50 hover:bg-orange-100 border border-orange-100 px-3 py-1.5 rounded-xl transition-all shadow-sm active:scale-95 w-fit"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back
+        </button>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-2xl font-black text-gray-800" style={{ fontFamily: "Outfit" }}>Track Order</h1>
           <p className="text-gray-500 text-sm mt-1 font-mono">#{(order.id as string)?.slice(-8).toUpperCase()}</p>

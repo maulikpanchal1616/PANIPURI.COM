@@ -4,7 +4,7 @@ import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Mail, Lock, UtensilsCrossed, ArrowRight, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, UtensilsCrossed, ArrowRight, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 function LoginForm() {
@@ -63,6 +63,7 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-[#FFF8F0] flex">
       {/* Left panel */}
@@ -90,7 +91,14 @@ export default function LoginPage() {
       </div>
 
       {/* Right panel */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
+        <button 
+          onClick={() => router.back()} 
+          className="absolute top-6 left-6 flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-orange-500 transition-colors bg-gray-50 hover:bg-orange-50 border border-gray-100 hover:border-orange-100 px-3 py-1.5 rounded-xl active:scale-95 transition-all shadow-sm"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back
+        </button>
         <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="w-full max-w-md">
           <Link href="/" className="flex items-center gap-2 mb-10 lg:hidden">
             <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl flex items-center justify-center">

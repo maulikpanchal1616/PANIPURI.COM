@@ -112,40 +112,78 @@ export default function HomePage() {
           <motion.div animate={{ x: [0,-20,0], y: [0,30,0] }} transition={{ duration: 10, repeat: Infinity, delay: 1 }} className="absolute -bottom-40 -left-40 w-[400px] h-[400px] bg-amber-200/50 rounded-full blur-3xl" />
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto text-center">
-          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="inline-flex items-center gap-2 bg-orange-100 text-orange-600 px-4 py-2 rounded-full text-sm font-semibold mb-6 border border-orange-200">
-            <Zap className="w-4 h-4 fill-orange-500" /> Ahmedabad&apos;s #1 Food Marketplace
-            <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full">NEW</span>
+        <div className="relative z-10 max-w-5xl mx-auto text-center w-full">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }} 
+            animate={{ opacity: 1, scale: 1 }} 
+            transition={{ delay: 0.1 }} 
+            className="inline-flex items-center gap-1.5 sm:gap-2 bg-orange-100 text-orange-600 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold mb-6 border border-orange-200 max-w-full"
+          >
+            <Zap className="w-4 h-4 fill-orange-500" /> 
+            <span className="truncate">Ahmedabad&apos;s #1 Food Marketplace</span>
+            <span className="bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">NEW</span>
           </motion.div>
-
-          <h1 ref={titleRef} className="text-5xl sm:text-6xl lg:text-8xl font-black leading-none mb-6 overflow-hidden" style={{ fontFamily: "Outfit, sans-serif" }}>
+ 
+          <h1 ref={titleRef} className="text-4xl sm:text-6xl lg:text-8xl font-black leading-none mb-6 overflow-hidden" style={{ fontFamily: "Outfit, sans-serif" }}>
             {["Khao", "Piyo,", "Jiyo!"].map((word, i) => (
-              <span key={i} className="word inline-block mr-4" style={{ opacity: 0 }}>
+              <span key={i} className="word inline-block mr-2 sm:mr-4" style={{ opacity: 0 }}>
                 {i === 1 ? <span className="gradient-text">{word}</span> : <span className="text-gray-800">{word}</span>}
               </span>
             ))}
           </h1>
-
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }} className="text-lg sm:text-xl text-gray-500 max-w-xl mx-auto mb-10 leading-relaxed">
+ 
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: 0.9 }} 
+            className="text-sm sm:text-base md:text-lg text-gray-500 max-w-xl mx-auto mb-8 sm:mb-10 px-2 leading-relaxed"
+          >
             From your favourite street-side stall to cloud kitchens — delivered fresh in minutes.
           </motion.p>
-
-          <motion.form onSubmit={handleSearch} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }} className="relative max-w-2xl mx-auto mb-6">
-            <div className="flex items-center gap-3 bg-white rounded-2xl p-2 shadow-2xl shadow-orange-100 border border-orange-100">
-              <div className="flex items-center gap-2 px-3 text-sm text-gray-500 border-r border-orange-100 pr-4 whitespace-nowrap">
+ 
+          <motion.form 
+            onSubmit={handleSearch} 
+            initial={{ opacity: 0, y: 30 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: 1.1 }} 
+            className="relative max-w-2xl mx-auto mb-6 px-2 sm:px-0"
+          >
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 bg-white rounded-2xl p-2 shadow-2xl shadow-orange-100 border border-orange-100">
+              <div className="hidden sm:flex items-center gap-2 px-3 text-sm text-gray-500 border-r border-orange-100 pr-4 whitespace-nowrap">
                 <MapPin className="w-4 h-4 text-orange-500" /> Ahmedabad <ChevronDown className="w-3 h-3" />
               </div>
-              <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
-              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search dishes, restaurants..." className="flex-1 outline-none text-gray-700 bg-transparent text-sm placeholder:text-gray-400" />
-              <motion.button type="submit" whileTap={{ scale: 0.95 }} className="bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold px-6 py-3 rounded-xl text-sm whitespace-nowrap">
+              <div className="flex items-center flex-1 gap-2 px-2">
+                <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                <input 
+                  type="text" 
+                  value={searchQuery} 
+                  onChange={(e) => setSearchQuery(e.target.value)} 
+                  placeholder="Search dishes, restaurants..." 
+                  className="w-full outline-none text-gray-700 bg-transparent text-sm placeholder:text-gray-400 py-2 sm:py-0" 
+                />
+              </div>
+              <motion.button 
+                type="submit" 
+                whileTap={{ scale: 0.95 }} 
+                className="bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold px-6 py-3.5 sm:py-3 rounded-xl text-sm whitespace-nowrap w-full sm:w-auto"
+              >
                 Find Food
               </motion.button>
             </div>
           </motion.form>
-
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3 }} className="flex items-center justify-center gap-2 flex-wrap">
+ 
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            transition={{ delay: 1.3 }} 
+            className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap px-2"
+          >
             {["Dhokla 🧡", "Undhiyu 🥘", "Pav Bhaji 🍞", "Fafda ✨", "Jalebi 🍯"].map((tag) => (
-              <button key={tag} onClick={() => router.push(`/search?q=${tag.split(" ")[0]}`)} className="text-sm bg-white/80 text-gray-600 border border-orange-100 px-3 py-1.5 rounded-full hover:border-orange-400 hover:text-orange-600 transition-all">
+              <button 
+                key={tag} 
+                onClick={() => router.push(`/search?q=${tag.split(" ")[0]}`)} 
+                className="text-xs sm:text-sm bg-white/80 text-gray-600 border border-orange-100 px-3 py-1.5 rounded-full hover:border-orange-400 hover:text-orange-600 transition-all whitespace-nowrap"
+              >
                 {tag}
               </button>
             ))}

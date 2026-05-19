@@ -17,7 +17,7 @@ type SubVendor = { id: string; stallName: string; stallType: string; isActive: b
 type Stats = { totalOrders: number; totalRevenue: number; rating: number; totalDishes: number };
 
 export default function VendorDashboardPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "dishes" | "stalls" | "orders" | "settings">("overview");
   const [dishes, setDishes] = useState<Dish[]>([]);
@@ -27,7 +27,8 @@ export default function VendorDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!session) { router.push("/auth/login"); return; }
+    if (status === "loading") return;
+    if (status === "unauthenticated" || !session) { router.push("/auth/login"); return; }
     if (session.user.role !== "VENDOR" && session.user.role !== "ADMIN") { router.push("/"); return; }
     Promise.all([
       fetch("/api/vendor/dishes").then((r) => r.json()),
@@ -40,7 +41,7 @@ export default function VendorDashboardPage() {
       setStats(st.stats ?? stats);
       setOrders(ord.orders ?? []);
     }).finally(() => setLoading(false));
-  }, [session]);
+  }, [session, status]);
 
   const toggleDish = async (dishId: string, current: boolean) => {
     await fetch(`/api/vendor/dishes/${dishId}`, {
@@ -109,13 +110,13 @@ export default function VendorDashboardPage() {
     <div className="min-h-screen bg-[#FFF8F0] pb-safe">
       <Navbar />
       <main className="max-w-6xl mx-auto px-4 pt-24 pb-20">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-black text-gray-800" style={{ fontFamily: "Outfit" }}>Vendor Dashboard</h1>
             <p className="text-gray-500 text-sm mt-1">Welcome back, {session?.user.name}</p>
           </div>
           <button onClick={() => router.push("/vendor/dishes/new")}
-            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-5 py-3 rounded-2xl transition-colors shadow-md shadow-orange-200">
+            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-5 py-3 rounded-2xl transition-colors shadow-md shadow-orange-200 self-start sm:self-auto w-full sm:w-auto justify-center sm:justify-start">
             <Plus className="w-5 h-5" /> Add Dish
           </button>
         </div>

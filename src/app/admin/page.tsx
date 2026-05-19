@@ -11,7 +11,7 @@ type Order = Record<string, unknown>;
 type AreaStat = { deliveryAddress: string; _count: { id: number } };
 
 export default function AdminNexusPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [stats, setStats] = useState<Stat | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -21,7 +21,8 @@ export default function AdminNexusPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "vendors" | "orders">("overview");
 
   useEffect(() => {
-    if (!session) { router.push("/auth/login"); return; }
+    if (status === "loading") return;
+    if (status === "unauthenticated" || !session) { router.push("/auth/login"); return; }
     if (session.user.role !== "ADMIN") { router.push("/"); return; }
     Promise.all([
       fetch("/api/admin/stats").then((r) => r.json()),
@@ -32,7 +33,7 @@ export default function AdminNexusPage() {
       setAreas(statsData.ordersByArea ?? []);
       setPendingVendors(vendorData.vendors ?? []);
     }).finally(() => setLoading(false));
-  }, [session]);
+  }, [session, status]);
 
   const approveVendor = async (vendorId: string, approve: boolean) => {
     await fetch(`/api/admin/vendors/${vendorId}`, {

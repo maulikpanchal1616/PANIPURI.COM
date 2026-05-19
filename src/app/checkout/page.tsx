@@ -24,7 +24,7 @@ const PAYMENT_METHODS = [
 ];
 
 export default function CheckoutPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const { items, getTotalPrice, getDeliveryFee, clearCart, vendorId } = useCartStore();
   const [address, setAddress] = useState("");
@@ -91,14 +91,39 @@ export default function CheckoutPage() {
     }
   }, [vendorId, hasHydrated]);
 
+  useEffect(() => {
+    if (hasHydrated && session) {
+      console.log("Fetching customer profile for default address...");
+      fetch("/api/profile")
+        .then((r) => {
+          if (!r.ok) throw new Error("Failed to fetch profile");
+          return r.json();
+        })
+        .then((data) => {
+          if (data?.user?.address) {
+            console.log("Setting default address from profile:", data.user.address);
+            setAddress(data.user.address);
+          }
+        })
+        .catch((err) => {
+          console.error("Error loading customer profile address:", err);
+        });
+    }
+  }, [hasHydrated, session]);
+
+
   const total = getTotalPrice();
   const deliveryFee = getDeliveryFee();
   const grandTotal = total + deliveryFee;
 
   useEffect(() => {
-    if (!session) router.push("/auth/login?callbackUrl=/checkout");
+    if (status === "loading") return;
+    if (status === "unauthenticated" || !session) {
+      router.push("/auth/login?callbackUrl=/checkout");
+      return;
+    }
     if (items.length === 0 && step !== "success") router.push("/");
-  }, [session, items, step]);
+  }, [session, status, items, step]);
 
   const handlePlaceOrder = async () => {
     if (!address.trim()) { setError("Please enter delivery address"); return; }
@@ -233,7 +258,7 @@ export default function CheckoutPage() {
                 </h2>
                 <button
                   onClick={() => setShowMap(true)}
-                  className="flex items-center gap-1.5 text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-50 px-3 py-1.5 rounded-xl transition-all"
+                  className="flex items-center gap-1.5 text-xs font-bold text-orange-500 hover:text-white hover:bg-orange-500 bg-orange-50 border border-orange-100 hover:border-transparent px-3 py-1.5 rounded-xl transition-all shadow-sm active:scale-95"
                 >
                   <MapIcon className="w-3.5 h-3.5" />
                   Select on Map
@@ -267,10 +292,18 @@ export default function CheckoutPage() {
               {(step === "payment" || step === "processing") && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
                   className="bg-white rounded-3xl p-6 border border-orange-100 shadow-sm">
-                  <h2 className="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
-                    <div className="w-7 h-7 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-black">2</div>
-                    Payment Method
-                  </h2>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="font-bold text-gray-800 text-lg flex items-center gap-2">
+                      <div className="w-7 h-7 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-black">2</div>
+                      Payment Method
+                    </h2>
+                    <button
+                      onClick={() => setStep("details")}
+                      className="text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-50 px-3 py-1.5 rounded-xl transition-all active:scale-95 shadow-sm"
+                    >
+                      ← Change Address
+                    </button>
+                  </div>
                   <div className="space-y-3">
                     {showQR && vendorData?.upiId ? (
                       <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}

@@ -11,13 +11,13 @@ export async function GET(
     const { id } = await params;
     const vendor = await prisma.vendor.findUnique({
       where: { id },
-      select: {
-        id: true,
-        businessName: true,
-        address: true,
-        upiId: true,
-        logoUrl: true,
-        isActive: true,
+      include: {
+        dishes: {
+          orderBy: {
+            name: "asc",
+          },
+        },
+        subVendors: true,
       },
     });
 

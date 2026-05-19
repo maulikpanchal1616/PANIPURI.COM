@@ -90,28 +90,70 @@ export default function LocationPicker({ onLocationSelect, onClose, initialLat =
     e.preventDefault();
     if (!searchQuery.trim()) return;
     setLoading(true);
-    try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
-      const data = await res.json();
-      if (data && data.length > 0) {
-        const { lat, lon, display_name } = data[0];
-        const newLat = parseFloat(lat);
-        const newLng = parseFloat(lon);
-        leafletMap.current?.setView([newLat, newLng], 15);
-        marker.current?.setLatLng([newLat, newLng]);
-        setAddress(display_name);
-        setCoords({ lat: newLat, lng: newLng });
+
+    const queryParts = searchQuery.split(",").map(s => s.trim()).filter(Boolean);
+    let found = false;
+    let customPrefix = "";
+
+    // Try cascading searches: start with the full query, then progressively drop specific leading terms
+    for (let i = 0; i < queryParts.length; i++) {
+      const currentQuery = queryParts.slice(i).join(", ");
+      if (!currentQuery) continue;
+
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(currentQuery)}`);
+        const data = await res.json();
+
+        if (data && data.length > 0) {
+          const { lat, lon, display_name } = data[0];
+          const newLat = parseFloat(lat);
+          const newLng = parseFloat(lon);
+
+          leafletMap.current?.setView([newLat, newLng], 15);
+          marker.current?.setLatLng([newLat, newLng]);
+
+          // Combine the custom detailed terms user wrote with OSM's general resolved address
+          const finalAddress = customPrefix ? `${customPrefix}, ${display_name}` : display_name;
+          setAddress(finalAddress);
+          setCoords({ lat: newLat, lng: newLng });
+          found = true;
+          break;
+        }
+      } catch (err) {
+        console.error("Nominatim geocoding fallback error:", err);
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+
+      // Prepend the detailed segments that were too specific for OpenStreetMap to search
+      customPrefix = customPrefix ? `${customPrefix}, ${queryParts[i]}` : queryParts[i];
     }
+
+    // Ultimate fallback: if everything fails, query Ahmedabad and prepend the custom search query
+    if (!found) {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=Ahmedabad`);
+        const data = await res.json();
+        if (data && data.length > 0) {
+          const { lat, lon, display_name } = data[0];
+          const newLat = parseFloat(lat);
+          const newLng = parseFloat(lon);
+
+          leafletMap.current?.setView([newLat, newLng], 15);
+          marker.current?.setLatLng([newLat, newLng]);
+
+          setAddress(`${searchQuery}, ${display_name}`);
+          setCoords({ lat: newLat, lng: newLng });
+        }
+      } catch (err) {
+        console.error("Nominatim city search ultimate fallback error:", err);
+      }
+    }
+
+    setLoading(false);
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[85vh]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm">
+      <div className="bg-white w-full h-full sm:h-[85vh] sm:max-w-2xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col">
         {/* Header */}
         <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
           <div>

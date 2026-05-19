@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
-import { Package, Clock, CheckCircle2, XCircle, Truck, ChefHat, ChevronRight } from "lucide-react";
+import { Package, Clock, CheckCircle2, XCircle, Truck, ChefHat, ChevronRight, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
@@ -19,23 +19,31 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
 };
 
 export default function OrdersPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [orders, setOrders] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!session) { router.push("/auth/login?callbackUrl=/orders"); return; }
+    if (status === "loading") return;
+    if (status === "unauthenticated" || !session) { router.push("/auth/login?callbackUrl=/orders"); return; }
     fetch("/api/orders")
       .then((r) => r.json())
       .then((d) => setOrders(d.orders ?? []))
       .finally(() => setLoading(false));
-  }, [session]);
+  }, [session, status]);
 
   return (
     <div className="min-h-screen bg-[#FFF8F0] pb-safe">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 pt-24 pb-20">
+        <button 
+          onClick={() => router.back()} 
+          className="mb-4 flex items-center gap-1.5 text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-50 hover:bg-orange-100 border border-orange-100 px-3 py-1.5 rounded-xl transition-all shadow-sm active:scale-95 w-fit"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back
+        </button>
         <h1 className="text-3xl font-black text-gray-800 mb-8" style={{ fontFamily: "Outfit" }}>My Orders</h1>
 
         {loading ? (

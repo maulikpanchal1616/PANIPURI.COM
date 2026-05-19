@@ -17,8 +17,13 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -108,11 +113,11 @@ export default function Navbar() {
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
               onClick={toggleCart}
-              className="magnetic-btn relative w-11 h-11 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl flex items-center justify-center shadow-md transition-colors"
+              className="hidden md:flex magnetic-btn relative w-11 h-11 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl items-center justify-center shadow-md transition-colors"
             >
               <ShoppingBag className="w-5 h-5" />
               <AnimatePresence>
-                {totalItems > 0 && (
+                {mounted && totalItems > 0 && (
                   <motion.span
                     key="badge"
                     initial={{ scale: 0 }}
@@ -127,7 +132,7 @@ export default function Navbar() {
             </button>
 
             {/* User */}
-            <div className="relative" ref={userMenuRef}>
+            <div className="hidden md:block relative" ref={userMenuRef}>
               {session ? (
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -165,6 +170,9 @@ export default function Navbar() {
                       <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
                     </div>
                     <div className="p-2">
+                      <Link href="/profile" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-50 text-sm text-gray-700 transition-colors">
+                        <User className="w-4 h-4 text-orange-500" />My Profile
+                      </Link>
                       <Link href="/orders" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-50 text-sm text-gray-700 transition-colors">
                         <ShoppingBag className="w-4 h-4 text-orange-500" />My Orders
                       </Link>
@@ -194,7 +202,7 @@ export default function Navbar() {
             {/* Mobile menu */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-orange-50 transition-colors"
+              className="hidden w-10 h-10 items-center justify-center rounded-xl hover:bg-orange-50 transition-colors"
             >
               {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -211,12 +219,54 @@ export default function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-white/95 backdrop-blur-xl border-t border-orange-100"
           >
-            <div className="px-4 py-4 space-y-2">
-              <Link href="/search" className="flex items-center gap-3 p-3 rounded-2xl bg-orange-50 text-orange-600 font-medium">
+            <div className="px-4 py-4 space-y-3">
+              <Link href="/search" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3.5 rounded-2xl bg-orange-50 text-orange-600 font-semibold text-sm">
                 <Search className="w-5 h-5" />Search Food
               </Link>
-              {!session && (
-                <Link href="/auth/login" className="flex items-center gap-3 p-3 rounded-2xl bg-orange-500 text-white font-medium">
+              {session ? (
+                <div className="space-y-2 pt-2 border-t border-orange-50">
+                  <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-100 mb-3">
+                    <div className="w-10 h-10 bg-orange-200 rounded-xl flex items-center justify-center font-bold text-orange-700">
+                      {session.user.image ? (
+                        <img src={session.user.image} alt="" className="w-full h-full object-cover rounded-xl" />
+                      ) : (
+                        session.user.name?.[0]?.toUpperCase()
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-sm text-gray-800 truncate leading-tight">{session.user.name}</p>
+                      <p className="text-xs text-gray-400 truncate mt-0.5">{session.user.email}</p>
+                    </div>
+                  </div>
+                  <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-2xl hover:bg-orange-50 text-gray-700 text-sm font-semibold transition-colors">
+                    <User className="w-5 h-5 text-orange-500" />My Profile
+                  </Link>
+                  
+                  <Link href="/orders" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-2xl hover:bg-orange-50 text-gray-700 text-sm font-semibold transition-colors">
+                    <ShoppingBag className="w-5 h-5 text-orange-500" />My Orders
+                  </Link>
+
+                  {session.user.role === "VENDOR" && (
+                    <Link href="/vendor/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-2xl hover:bg-orange-50 text-gray-700 text-sm font-semibold transition-colors">
+                      <ChefHat className="w-5 h-5 text-orange-500" />Vendor Dashboard
+                    </Link>
+                  )}
+
+                  {session.user.role === "ADMIN" && (
+                    <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-2xl hover:bg-orange-50 text-gray-700 text-sm font-semibold transition-colors">
+                      <Shield className="w-5 h-5 text-orange-500" />Admin Nexus
+                    </Link>
+                  )}
+
+                  <button
+                    onClick={() => { signOut({ callbackUrl: "/" }); setIsMenuOpen(false); }}
+                    className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-red-50 text-red-600 text-sm font-semibold transition-colors mt-2 border-t border-gray-100"
+                  >
+                    <LogOut className="w-5 h-5" />Sign Out
+                  </button>
+                </div>
+              ) : (
+                <Link href="/auth/login" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 p-3.5 rounded-2xl bg-orange-500 text-white font-semibold text-sm justify-center shadow-lg shadow-orange-200">
                   <User className="w-5 h-5" />Login / Register
                 </Link>
               )}
