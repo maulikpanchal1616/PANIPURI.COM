@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: { allowedOrigins: ["localhost:3000"] },
   },
+  env: {
+    NEXTAUTH_URL: process.env.NODE_ENV === "production" ? "https://khanipinistore.vercel.app" : "http://localhost:3000",
+    NEXTAUTH_SECRET: "panipuri_secret_key_12345678901234567890",
+  },
   async headers() {
     return [
       {
