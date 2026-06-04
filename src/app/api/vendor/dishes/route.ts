@@ -10,12 +10,11 @@ export async function GET() {
     const session = await getServerSession(authOptions);
     if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    let vendor = await prisma.vendor.findUnique({ where: { userId: session.user.id } });
-    if (!vendor && session.user.role === "VENDOR") {
-      vendor = await prisma.vendor.create({
-        data: { userId: session.user.id, businessName: `${session.user.name}'s Kitchen`, address: "Ahmedabad", latitude: 23.0225, longitude: 72.5714, isApproved: true, isActive: true }
-      });
-    }
+    const vendor = await prisma.vendor.upsert({
+      where: { userId: session.user.id },
+      update: {},
+      create: { userId: session.user.id, businessName: `${session.user.name}'s Kitchen`, address: "Ahmedabad", latitude: 23.0225, longitude: 72.5714, isApproved: true, isActive: true }
+    });
     if (!vendor) return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
 
     const dishes = await prisma.dish.findMany({
@@ -35,12 +34,11 @@ export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions);
     if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    let vendor = await prisma.vendor.findUnique({ where: { userId: session.user.id } });
-    if (!vendor && session.user.role === "VENDOR") {
-      vendor = await prisma.vendor.create({
-        data: { userId: session.user.id, businessName: `${session.user.name}'s Kitchen`, address: "Ahmedabad", latitude: 23.0225, longitude: 72.5714, isApproved: true, isActive: true }
-      });
-    }
+    const vendor = await prisma.vendor.upsert({
+      where: { userId: session.user.id },
+      update: {},
+      create: { userId: session.user.id, businessName: `${session.user.name}'s Kitchen`, address: "Ahmedabad", latitude: 23.0225, longitude: 72.5714, isApproved: true, isActive: true }
+    });
     if (!vendor) return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
 
     const body = await req.json();
