@@ -28,8 +28,15 @@ export default function VendorDashboardPage() {
 
   useEffect(() => {
     if (status === "loading") return;
-    if (status === "unauthenticated" || !session) { router.push("/auth/login"); return; }
-    if (session.user.role !== "VENDOR" && session.user.role !== "ADMIN") { router.push("/"); return; }
+    if (status === "unauthenticated" || !session) {
+      // Temporarily disabled redirect to diagnose the issue
+      console.error("Dashboard: User is unauthenticated according to useSession");
+      // router.push("/auth/login"); return; 
+    }
+    if (session?.user?.role !== "VENDOR" && session?.user?.role !== "ADMIN") { 
+      console.error("Dashboard: Role mismatch or missing session", session);
+      // router.push("/"); return; 
+    }
     Promise.all([
       fetch("/api/vendor/dishes").then((r) => r.json()),
       fetch("/api/vendor/subvendors").then((r) => r.json()),
@@ -110,6 +117,17 @@ export default function VendorDashboardPage() {
     <div className="min-h-screen bg-[#FFF8F0] pb-safe">
       <Navbar />
       <main className="max-w-6xl mx-auto px-4 pt-24 pb-20">
+        
+        {/* DEBUG BANNER */}
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+          <strong className="font-bold">DEBUG INFO: </strong>
+          <span className="block sm:inline">
+            Status: {status} | 
+            Session: {session ? "EXISTS" : "NULL"} | 
+            Role: {session?.user?.role || "NONE"}
+          </span>
+        </div>
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-black text-gray-800" style={{ fontFamily: "Outfit" }}>Vendor Dashboard</h1>

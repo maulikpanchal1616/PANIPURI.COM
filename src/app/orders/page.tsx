@@ -26,7 +26,10 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (status === "loading") return;
-    if (status === "unauthenticated" || !session) { router.push("/auth/login?callbackUrl=/orders"); return; }
+    if (status === "unauthenticated" || !session) { 
+      console.error("Orders: Session is unauthenticated");
+      // router.push("/auth/login?callbackUrl=/orders"); return; 
+    }
     fetch("/api/orders")
       .then((r) => r.json())
       .then((d) => setOrders(d.orders ?? []))
@@ -37,6 +40,16 @@ export default function OrdersPage() {
     <div className="min-h-screen bg-[#FFF8F0] pb-safe">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 pt-24 pb-20">
+        
+        {/* DEBUG BANNER */}
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+          <strong className="font-bold">DEBUG INFO: </strong>
+          <span className="block sm:inline">
+            Status: {status} | 
+            Session: {session ? "EXISTS" : "NULL"}
+          </span>
+        </div>
+
         <button 
           onClick={() => router.back()} 
           className="mb-4 flex items-center gap-1.5 text-xs font-bold text-orange-500 hover:text-orange-600 bg-orange-50 hover:bg-orange-100 border border-orange-100 px-3 py-1.5 rounded-xl transition-all shadow-sm active:scale-95 w-fit"

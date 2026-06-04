@@ -61,5 +61,5 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || "稳定的panipuri_secret_key_1234567890",
+  secret: process.env.NEXTAUTH_SECRET || "panipuri_secret_key_12345678901234567890",
 };
